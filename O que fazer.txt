@@ -1,0 +1,14 @@
+- Terminar de limpar o código e comentar
+
+- transformar em classe 
+
+- adaptar a interface para tablet:
+	botão de play e pause
+	menus
+	colocar gestos para as ações
+
+
+- pesquisar biblioteca de audio (player pelo menos)
+
+- pesquisar biblioteca de sintetizador de som
+

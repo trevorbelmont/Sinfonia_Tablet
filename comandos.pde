@@ -1,51 +1,138 @@
 String somAtual;
 boolean carregandoSom;
 
-void criabola() {//desenha a bola
+class Bolas {
+  color corb;
+  float x;
+  float y;
+  float vx;
+  float vy;
+  float  raio, g, atrito, ax;
+  boolean cai;
+  float t;
+  //float brilho;
+  int canal;
+  boolean selecionada;
 
-    for (int i= 0; i < nbola; i++) {
-    pushMatrix();
-    //scale(0.85);
-    stroke(corb[i]);
-    fill(0, t[i]); 
-    strokeWeight(5);
-    ellipse(x[i], y[i], raio, raio);
-    strokeWeight(1);
+  //  boolean paraBola = false;
 
-    fill(cmenu[canal[i]]);
-    ellipse(x[i], y[i], raio/3, raio/3);  
-    popMatrix();
+  Bolas () {
+    raio = 42.5;
+    g = 0.98;
+    ax = 0;
+    atrito = 1;
+    t=255;
+    canal= 0;
+    selecionada = false;
+    nbola = nbola +1;
+    x = pmouseX; // incialização dos parâmetros das novas bolinhas criadas
+    y = pmouseY;
+    vx=0;
+    vy=0;
+
+    selecionada = false;
+    cai = false;// a bolinha inicia parada
   }
-}
 
-void gravidade() {// bola com a gravidade
-  for (int i= 0; i < nbola; i++) {  
-    if (cai[i] == true) {
-      vy[i] = vy[i] +g;
+  void criabola() {//desenha a bola
+
+      for (int i= 0; i < nbola; i++) {
+      pushMatrix();
+      //scale(0.85);
+      stroke(corb);
+      fill(0, t); 
+      strokeWeight(5);
+      ellipse(x, y, raio, raio);
+      strokeWeight(1);
+
+      fill(cmenu[canal]);
+      ellipse(x, y, raio/3, raio/3);  
+      popMatrix();
     }
   }
-}
 
-void chao() { // interação da bola com o chão
-  for (int i= 0; i < nbola; i++) {
-    if (y[i] >= height- raio/2 ) {
+  void gravidade() {// bola com a gravidade
+
+      if (cai == true) {
+      vy = vy +g;
+    }
+  }
+
+
+  void chao() { // interação da bola com o chão
+    if (y >= height- raio/2 ) {
       //inverte a velocidade da bolinha ao tocar ao chão
-      vy[i] = -vy[i];
+      vy= -vy;
 
       int qualNota;
-      // garante que a blinha sempre caia em uma tecla
-      x[i] = constrain(x[i], 1, width-1);  
+      // garante que a bolinha sempre caia em uma tecla
+      x = constrain(x, 1, width-1);  
       //diz qual nota foi tocada e acende o pedaço correspondente
-      qualNota = int((x[i]/intervalo));
+      qualNota = int((x/intervalo));
       brilho[qualNota] = 255;
-    
-     //---------------------
-     println("toca" + qualNota + "------------------");
-     tocadores[qualNota].tocaNota();
-     
-    //---------------------------- 
-     
-     
+
+      //---------------------
+      //println("toca" + qualNota + "------------------");
+      tocadores[qualNota].tocaNota();
+
+      //----------------------------
+    }
+  }
+  void movimento() {// cinemática da bola
+    for (int i= 0; i < nbola; i++) {
+
+      if (cai == true) {
+        vy = vy +g;
+        y = y + vy;
+        x= x + vx;
+      }
+      if (x<=0+raio/2 ||x>=width-raio/2) {
+        vx=-vx;
+      }
+    }
+  }
+
+
+  void calcdentro() {
+
+    //for (int i= 0; i < nbola; i++) {
+    corb =color( 0);// a cor do stroke de cada bolinha
+
+
+    //for (int i= 0; i < nbola; i++) {
+    if ( (dist(mouseX, mouseY, x, y)<raio/2)) {    
+      selecionada = true; // se o mouse tiver em cima, seleciona a bolinha
+    }
+    else {
+      selecionada = false;
+    }
+
+    if (selecionada= true) {// se a bolinha esta selecionada
+      cai = false;//ela para de cair
+      strokeWeight(5);
+      stroke(255, 0, 0);//fica selecionada em vermelho
+      vy = 0;//zera as velocidades
+      vx = 0;
+      t=80;// fica transparente 
+      corb= color(255, 0, 0);
+    }
+  }
+  void rect_select() { // função que desenha o quadrado seletor das bolinhas
+    noStroke();
+    fill(43, 195, 214, 50);
+    //stroke(0,255,0);
+    rect(xrect, yrect, tamxrect, tamyrect);
+  }
+
+  void calc_rect_dentro() {//função que calcula interação do quadrado seletor com as bolinhas
+    if (!mousePressed) return;// se n apertar o mouse sai da função
+
+    //for (int i= 0; i < nbola; i++) {
+
+    if (x > xrect && x < xrect + tamxrect &&
+      y > yrect && y < yrect + tamyrect) {// se as bolinhas estiverem dentro do quadrado seletor
+
+      corb = color(255, 0, 0);
     }
   }
 }
@@ -65,85 +152,40 @@ void lixeira(float _x, float _y) {
 }
 
 
-void movimento() {// cinemática da bola
-  for (int i= 0; i < nbola; i++) {
-
-    if (cai[i] == true) {
-      vy[i] = vy[i] +g;
-      y[i] = y[i] + vy[i];
-      x[i]= x[i] + vx[i];
-    }
-    if (x[i]<=0+raio/2 ||x[i]>=width-raio/2) {
-      vx[i]=-vx[i];
-    }
-  }
-}
 
 
-void calcdentro() {
 
-  for (int i= 0; i < nbola; i++) {
-    corb[i] =color( 0);// a cor do stroke de cada bolinha
-  }
-
-  for (int i= 0; i < nbola; i++) {
-    if ( (dist(mouseX, mouseY, x[i], y[i])<raio/2)) {    
-      qualCai = i; // se o mouse tiver em cima, seleciona a bolinha
-    }
-  }
-
-  if (qualCai > -1) {// se a bolinha esta selecionada
-    cai[qualCai] = false;//ela para de cair
-    strokeWeight(5);
-    stroke(255, 0, 0);//fica selecionada em vermelho
-    vy[qualCai] = 0;//zera as velocidades
-    vx[qualCai] = 0;
-    t[qualCai]=80;// fica transparente 
-    corb[qualCai] = color(255, 0, 0);
-  }
-}
-void rect_select() { // função que desenha o quadrado seletor das bolinhas
-  noStroke();
-  fill(43, 195, 214, 50);
-  //stroke(0,255,0);
-  rect(xrect, yrect, tamxrect, tamyrect);
-}
-
-void calc_rect_dentro() {//função que calcula interação do quadrado seletor com as bolinhas
-  if (!mousePressed) return;// se n apertar o mouse sai da função
-
-  for (int i= 0; i < nbola; i++) {
-
-    if (x[i] > xrect && x[i] < xrect + tamxrect &&
-      y[i] > yrect && y[i] < yrect + tamyrect) {// se as bolinhas estiverem dentro do quadrado seletor
-
-      corb[i] = color(255, 0, 0);
-    }
-  }
-}
 
 void maisbola(int knal) {// função costrutora das bolinhas
   //nbola refere ao número total de bolinhas
-  x[nbola] = pmouseX; // incialização dos parâmetros das novas bolinhas criadas
-  y[nbola] = pmouseY;
-  t[nbola]=255;
-  vx[nbola] =0;
-  vy[nbola] =0;
-  canal[nbola] = knal; 
-  cai[nbola] = false;// a bolinha inicia parada
+
+  nbola = nbola +1;
+  bola[nbola].x = pmouseX; // incialização dos parâmetros das novas bolinhas criadas
+  bola[nbola].y = pmouseY;
+  bola[nbola].t=255;
+  bola[nbola].vx=0;
+  bola[nbola].vy=0;
+  bola[nbola].canal = knal; 
+  bola[nbola].selecionada = false;
+  bola[nbola].cai = false;// a bolinha inicia parada
   nbola = nbola +1;
   if (nbola > 300) {// garante o número máximo de 300 bolinhas
     nbola = 300;
   }
 }
 
-void menosbola() {// função destrutora das bolinhas
+void menosbola() { // função destrutora das bolinhas
 
   nbola = nbola -1;
   if (nbola < 0) {
     nbola = 0;
   }
 }
+
+
+
+
+
 //********************************************
 // funções responsáveis por carregar os sons de cada tecla ( notas dentro das oitavas)
 //-> void fechaSons() {
@@ -166,4 +208,5 @@ void menosbola() {// função destrutora das bolinhas
  println(carregandoSom);   
  <-*/
 //-> }
+//}
 
